@@ -1,0 +1,53 @@
+:root {
+  --first-color: #333333;
+  --second-color: #666666;
+  --three-color: #999999;
+}
+body {
+  font-family: Courier New, Courier, monospace;
+  color: var(--first-color);
+}
+.page {
+  height: 100vh;
+  overflow-y: auto;
+}
+.dfs {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.dfb {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.dfa {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.dfc {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
+.sc {
+  color: var(--second-color);
+}
+.tc {
+  color: var(--three-color);
+}
+.fontw {
+  font-weight: 600;
+}
+.small {
+  font-size: 12px;
+}
