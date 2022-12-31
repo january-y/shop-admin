@@ -11,8 +11,6 @@ const useLazyImg = (
   function callbackFn(entries: any) {
     if (entries[0].isIntersecting) {
       img.src = img?.getAttribute('data-url') as string
-      console.log(entries[0].isIntersecting)
-
       io.unobserve(img as HTMLElement)
     }
   }
@@ -22,6 +20,8 @@ const useLazyImg = (
   function uninstall() {
     io.disconnect()
   }
+
+  return { uninstall }
 }
 
 export default useLazyImg
