@@ -32,6 +32,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
+      '/hd': {
+        target: 'https://www.redcave.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/hd/, ''),
+      },
     },
   },
 })

@@ -9,3 +9,14 @@ export const login = (username: any, password: any) => {
     },
   })
 }
+
+export const editPwd = (oldpassword: any, password: any, repassword: any) => {
+  return axRequest.post({
+    url: '/admin/updatepassword',
+    data: {
+      oldpassword,
+      password,
+      repassword,
+    },
+  })
+}

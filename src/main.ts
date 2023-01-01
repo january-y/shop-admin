@@ -5,6 +5,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'virtual:windi.css'
 import 'normalize.css'
 // import 'element-plus/dist/index.css'
+import 'element-plus/es/components/message/style/css'
 import '@/assets/css/index.less'
 
 import App from './App.vue'

@@ -37,9 +37,10 @@ const axRequest = new AxRequtst({
 // 测试拦截不同关系请求
 const mockRequest = new AxRequtst({
   timeout: 8000,
+  // baseURL: '/hd',
   interceptors: {
-    requestSucessFn: (config) => {
-      // console.log("请求成功拦截");
+    requestSucessFn: (config: any) => {
+      // console.log("请求成功拦截")
       return config
     },
     requestFailureFn: (err) => {
