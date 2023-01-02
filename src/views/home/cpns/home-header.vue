@@ -5,11 +5,12 @@
       <el-icon><UploadFilled /></el-icon>
       <div class="title">后台管理系统</div>
       <div class="menu cp">
-        <toolTip color="dark" position="top" title="菜单">
-          <el-icon :size="18"><Expand /></el-icon>
+        <toolTip color="dark" position="top" title="展开">
+          <el-icon :size="18" @click="handleOpen" v-show="isMenuOpen"><Expand /></el-icon>
         </toolTip>
-
-        <!-- <el-icon :size="18"><Fold /></el-icon> -->
+        <toolTip color="dark" position="top" title="收起">
+          <el-icon :size="18" @click="handleOpen" v-show="!isMenuOpen"><Fold /></el-icon>
+        </toolTip>
       </div>
       <div class="reset cp" @click="reload">
         <toolTip color="dark" position="top" title="刷新">
@@ -62,11 +63,15 @@ import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
+import useHomeStore from '@/stores/home'
 const toolTip = defineAsyncComponent(() => import('@/components/tooltip.vue'))
 const changePwdVue = defineAsyncComponent(() => import('./home-changePwd.vue'))
 
+const emit = defineEmits(['change-open'])
 const router = useRouter()
-const isShowDrawer = ref(false)
+const homeStore = useHomeStore()
+const isShowDrawer = ref<boolean>(false)
+let isMenuOpen = ref<boolean>(false)
 function exit() {
   ElMessage.success('操作成功!')
   localStorage.setItem('token', '')
@@ -79,11 +84,16 @@ function reload() {
   location.reload()
   // ElMessage.success('刷新成功!')
 }
+function handleOpen() {
+  isMenuOpen.value = !isMenuOpen.value
+  // instance?.proxy?.$mitt.emit('handle-menu')
+  homeStore.isOpenMenus = !homeStore.isOpenMenus
+}
 </script>
 
 <style lang="less" scoped>
 .home-header {
-  padding: 20px 0;
+  height: 100%;
   padding-left: 60px;
   background-color: #4338ca;
   color: #e0e7ff;

@@ -10,12 +10,14 @@ const router = createRouter({
     {
       path: '/',
       name: 'index',
-      redirect: '/home',
-    },
-    {
-      path: '/home',
-      name: 'home',
       component: () => import('@/views/home/home.vue'),
+      children: [
+        {
+          path: '/test',
+          name: 'test',
+          component: () => import('@/components/test.vue'),
+        },
+      ],
       meta: {
         title: '后台首页',
       },
@@ -38,19 +40,18 @@ const router = createRouter({
     },
   ],
 })
-
 // 路由守卫
 router.beforeEach((to, from) => {
   document.title = to.meta.title as string
   NProgress.start()
   const token = localStorage.getItem('token')
-  if (to.path == '/home' && !token) {
+  if (to.path == '/' && !token) {
     ElMessage.error('请先登入!')
     return '/login'
   }
   if (to.path == '/login' && token) {
     ElMessage.success('已登入!')
-    return '/home'
+    return '/'
   }
 })
 router.afterEach(() => {

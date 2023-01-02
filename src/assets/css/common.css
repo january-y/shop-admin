@@ -10,6 +10,11 @@ body {
 .page {
   height: 100vh;
   overflow-y: auto;
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+}
+.page ::-webkit-scrollbar {
+  display: none;
 }
 .dfs {
   display: flex;

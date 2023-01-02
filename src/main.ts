@@ -10,8 +10,21 @@ import '@/assets/css/index.less'
 
 import App from './App.vue'
 import router from './router'
+// bus
+import Mitt from 'mitt'
+
+const mitt = Mitt()
+
+//TypeScript注册
+// 由于必须要拓展ComponentCustomProperties类型才能获得类型提示
+declare module 'vue' {
+  export interface ComponentCustomProperties {
+    $mitt: typeof mitt
+  }
+}
 
 const app = createApp(App)
+app.config.globalProperties.$mitt = mitt
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
