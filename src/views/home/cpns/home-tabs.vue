@@ -27,13 +27,13 @@ const handleNavigate = (item: any, index: number) => {
   router.push(item.path)
   currentIndex.value = index
   // 修改菜单索引
-  publicStore.menuIndexList.forEach((itemm: any) => {
-    if (itemm.path == item.path) {
-      publicStore.currentMenu = itemm.index
-      console.log('找到', itemm)
-    }
-  })
-  console.log('传值', item)
+  function deepFind(menusArr: any) {
+    menusArr.forEach((itemm: any) => {
+      if (itemm.frontpath == item.path) publicStore.currentMenu = itemm.index
+      if (itemm.child) deepFind(itemm.child)
+    })
+  }
+  deepFind(homeStore.haveIndexMenus)
 }
 const handleDelTab = (item: any) => {
   const res = homeStore.topTabs.findIndex((itemm: any) => itemm.name == item.name)

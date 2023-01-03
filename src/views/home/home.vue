@@ -5,7 +5,7 @@
     </div>
     <!--  -->
     <div class="main dfs">
-      <div class="asside" ref="assideRef"><homeAsside :menus="menus" /></div>
+      <div class="asside" ref="assideRef"><homeAsside :menus="homeStore.haveIndexMenus" /></div>
       <div class="right">
         <homeMain />
       </div>

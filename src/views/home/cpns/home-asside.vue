@@ -10,7 +10,7 @@
     >
       <!-- 循环 -->
       <template v-for="(item, index) in menus" :key="item.order">
-        <el-sub-menu :index="index + ''">
+        <el-sub-menu :index="item.index + ''">
           <template #title>
             <el-icon>
               <component :is="item.icon"></component>
@@ -23,7 +23,7 @@
             <div>
               <el-menu-item-group>
                 <el-menu-item
-                  :index="index + '-' + indexx"
+                  :index="itemm.index"
                   @click="handleItemClick(index + '-' + indexx, itemm)"
                 >
                   <el-icon>
@@ -68,7 +68,7 @@ const publicStore = usePublicStore()
 const assideRef = ref<HTMLElement>()
 let isClose = ref<boolean>(false)
 const handleItemClick = (index: string, item: any) => {
-  // console.log(item)
+  console.log(item.index)
   publicStore.currentMenu = index
   if (homeStore.topTabs.length >= 11) {
     homeStore.topTabs.splice(0, 1)
