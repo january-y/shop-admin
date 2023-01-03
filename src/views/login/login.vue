@@ -29,9 +29,7 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" round @click="handleLogin" :loading="publicStore.isLoading"
-            >登录</el-button
-          >
+          <el-button type="primary" round @click="handleLogin" :loading="false">登录</el-button>
         </el-form-item>
       </el-form>
       <!-- el -->
@@ -47,6 +45,7 @@ import usePublicStore from '@/stores/public'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 import { login } from '@/services/modules/login'
+import useHomeStore from '@/stores/home'
 
 interface IFormData {
   username: any
@@ -55,6 +54,7 @@ interface IFormData {
 
 const router = useRouter()
 const publicStore = usePublicStore()
+const homeStore = useHomeStore()
 const elFormRef = ref<FormInstance>()
 const formData = reactive<IFormData>({ username: '', password: '' })
 const rules = reactive<FormRules>({
@@ -73,17 +73,17 @@ const handleLogin = () => {
   timer = setTimeout(() => {
     elFormRef.value?.validate((res, file) => {
       res &&
-        login(formData.username, formData.password)
-          .then((res: any) => {
-            if (res.data.token) {
-              ElMessage.success('登入成功!')
-              router.push('home')
-              publicStore.token = res.data.token
-              publicStore.isLogin = true
-              localStorage.setItem('token', res.data.token)
-            }
-          })
-          .catch(() => ElMessage.error('账号或密码错误!'))
+        login(formData.username, formData.password).then((res: any) => {
+          if (res.data.token) {
+            publicStore.token = res.data.token
+            localStorage.setItem('token', res.data.token)
+            ElMessage.success('登入成功!')
+            router.push('/')
+            homeStore.loadingRoute()
+            publicStore.isLogin = true
+          }
+        })
+      // .catch(() => ElMessage.error('账号或密码错误!'))
     })
     timer = null
   }, 100)

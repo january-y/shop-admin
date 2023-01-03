@@ -7,24 +7,32 @@
     <div class="main dfs">
       <div class="asside" ref="assideRef"><homeAsside :menus="menus" /></div>
       <div class="right">
-        <!-- <homeMain /> -->
-        <router-view></router-view>
+        <homeMain />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineAsyncComponent, computed } from 'vue'
+import {
+  ref,
+  onMounted,
+  onUnmounted,
+  onActivated,
+  onDeactivated,
+  defineAsyncComponent,
+  computed,
+} from 'vue'
 import type { Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import useHomeStore from '@/stores/home'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 const homeHeader = defineAsyncComponent(() => import('./cpns/home-header.vue'))
 const homeAsside = defineAsyncComponent(() => import('./cpns/home-asside.vue'))
 const homeMain = defineAsyncComponent(() => import('./cpns/home-main.vue'))
 
 const router = useRouter()
+const route = useRoute()
 const homeStore = useHomeStore()
 homeStore.getMenuInfosAction()
 const { userMenuInfos } = storeToRefs(homeStore)
@@ -36,6 +44,19 @@ function fff(confirmLoading: Ref<boolean>) {
     confirmLoading.value = false
   }, 1000)
 }
+
+onActivated(() => {
+  console.log('home onActivated')
+})
+onDeactivated(() => {
+  console.log('home onDeactivated')
+})
+onMounted(() => {
+  console.log('home onMounted')
+})
+onUnmounted(() => {
+  console.log('home onUnmounted')
+})
 </script>
 
 <style lang="less" scoped>
@@ -63,9 +84,8 @@ function fff(confirmLoading: Ref<boolean>) {
     }
     .right {
       height: calc(100vh - 70px);
-      // width: calc(100vw - 250px);
+      // width: calc(100vw - 270px);
       width: 100%;
-      background-color: #999999;
       overflow-y: auto;
       // 滚动条
       -ms-overflow-style: none;

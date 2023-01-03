@@ -35,12 +35,12 @@
             </div>
             <!-- no have child -->
             <!-- havd child -->
-            <div v-if="itemm.child.length >= 1">
+            <!-- <div v-if="itemm.child.length >= 1">
               <el-sub-menu index="1-4">
                 <template #title>item four</template>
                 <el-menu-item index="1-4-1">item one</el-menu-item>
               </el-sub-menu>
-            </div>
+            </div> -->
             <!-- havd child -->
           </template>
 
@@ -56,25 +56,44 @@
 import { ref } from 'vue'
 import useHomeStore from '@/stores/home'
 import usePublicStore from '@/stores/public'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   menus: any
 }>()
 
+const router = useRouter()
 const homeStore = useHomeStore()
 const publicStore = usePublicStore()
 const assideRef = ref<HTMLElement>()
 let isClose = ref<boolean>(false)
 const handleItemClick = (index: string, item: any) => {
+  // console.log(item)
   publicStore.currentMenu = index
-  console.log(item)
+  if (homeStore.topTabs.length >= 11) {
+    homeStore.topTabs.splice(0, 1)
+  }
+  const theSame = homeStore.topTabs.find((itemm: any) => itemm.name == item.name)
+  if (!theSame) {
+    homeStore.topTabs.push({
+      name: item.name,
+      path: item.frontpath,
+    })
+  }
+
+  // console.log(index)
+  if (item.frontpath == '/') {
+    router.push('/main/control')
+  } else {
+    router.push(item.frontpath)
+  }
 }
 </script>
 
 <style lang="less" scoped>
 .home-asside {
   transition: all 0.5s !important;
-  width: 250px;
+  width: 300px;
   // width: 100%;
 }
 </style>

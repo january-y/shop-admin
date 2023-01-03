@@ -30,6 +30,7 @@ const axRequest = new AxRequtst({
     },
     responseFailureFn: (err) => {
       // console.log('axRequest的响应失败拦截')
+      publicStore.isLoading = false
       return err
     },
   },

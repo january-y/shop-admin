@@ -59,3 +59,6 @@ body {
 .cp {
   cursor: pointer;
 }
+.hover:hover {
+  color: skyblue;
+}

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
+import { routeOptions } from '@/hooks/mapRouter'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
@@ -13,9 +14,13 @@ const router = createRouter({
       component: () => import('@/views/home/home.vue'),
       children: [
         {
-          path: '/test',
-          name: 'test',
-          component: () => import('@/components/test.vue'),
+          path: '/main/control',
+          name: '/main/control',
+          component: () => import('@/views/admin-panel/main-control/main-control.vue'),
+        },
+        {
+          path: '/',
+          redirect: '/main/control',
         },
       ],
       meta: {
@@ -35,17 +40,33 @@ const router = createRouter({
       name: 'notFound',
       component: () => import('@/views/notFound/notFound.vue'),
       meta: {
-        title: '404 NotFound',
+        title: '',
       },
     },
   ],
 })
+
+// 验证权限添加路由
+export const checkRouter = (routerArr: any[]) => {
+  //
+  for (let item of routerArr) {
+    if (item.frontpath == '/') continue
+    for (let route of routeOptions) {
+      if (route.path == item.frontpath) {
+        router.addRoute('index', route)
+      }
+    }
+    // child
+    if (item.child) checkRouter(item.child)
+  }
+}
+
 // 路由守卫
 router.beforeEach((to, from) => {
   document.title = to.meta.title as string
   NProgress.start()
   const token = localStorage.getItem('token')
-  if (to.path == '/' && !token) {
+  if (to.path !== '/login' && !token) {
     ElMessage.error('请先登入!')
     return '/login'
   }
