@@ -74,7 +74,7 @@ const isShowDrawer = ref<boolean>(false)
 let isMenuOpen = ref<boolean>(false)
 function exit() {
   ElMessage.success('操作成功!')
-  localStorage.setItem('token', '')
+  localStorage.clear()
   router.push('/login')
 }
 function changePwd() {

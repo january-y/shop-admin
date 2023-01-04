@@ -70,7 +70,7 @@ let isClose = ref<boolean>(false)
 const handleItemClick = (index: string, item: any) => {
   console.log(item.index)
   publicStore.currentMenu = index
-  if (homeStore.topTabs.length >= 11) {
+  if (homeStore.topTabs.length >= 10) {
     homeStore.topTabs.splice(0, 1)
   }
   const theSame = homeStore.topTabs.find((itemm: any) => itemm.name == item.name)

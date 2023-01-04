@@ -66,6 +66,9 @@ const handleClear = () => {
       .del {
         margin-left: 5px;
         font-size: 25px;
+        // &:hover {
+        //   color: skyblue !important;
+        // }
       }
     }
     .active {

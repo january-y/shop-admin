@@ -6,7 +6,7 @@
 
 body {
   font-family: Courier New, Courier, monospace;
-  color: var(--first-color);
+  color: var(--first-color) !important;
 }
 .page {
   height: 100vh;
@@ -46,11 +46,19 @@ body {
   flex-shrink: 0;
   flex-wrap: nowrap;
 }
+.dfcs {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  // align-items: center;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
 .sc {
-  color: var(--second-color);
+  color: var(--second-color) !important;
 }
 .tc {
-  color: var(--three-color);
+  color: var(--three-color) !important;
 }
 .fontw {
   font-weight: 600;
@@ -63,6 +71,12 @@ body {
 }
 .hover {
   &:hover {
-    color: skyblue;
+    color: skyblue !important;
+  }
+}
+.boxs {
+  &:hover {
+    transition: all 0.1s;
+    box-shadow: 1px 1px 15px #e6e4e4 !important;
   }
 }
