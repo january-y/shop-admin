@@ -12,6 +12,7 @@ import pinia from './stores'
 // bus
 import Mitt from 'mitt'
 import { checkRouter } from '@/router/index'
+import { registerDirectiveFocus } from './hooks/registerDirective'
 
 const mitt = Mitt()
 
@@ -34,4 +35,6 @@ app.use(pinia)
 app.use(router)
 const menus: any = JSON.parse(localStorage.getItem('menus') as string)
 if (menus) checkRouter(menus)
+// 自定义指令
+registerDirectiveFocus(app)
 app.mount('#app')

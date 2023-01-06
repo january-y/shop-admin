@@ -10,16 +10,14 @@
     <el-drawer v-model="isShow" title="I am the title" :with-header="false" :size="size">
       <div class="content">
         <div class="header dfb">
-          <div class="title">{{ title }}</div>
-          <div class="out cp" @click="handleCancel">×</div>
+          <div class="title sc">{{ title }}</div>
+          <div class="out cp sc" @click="handleCancel">×</div>
         </div>
         <div class="main">
           <slot name="main"></slot>
         </div>
         <div class="footer">
-          <el-button type="primary" @click="handleConfirm" :loading="confirmLoading"
-            >确定</el-button
-          >
+          <el-button type="primary" @click="handleConfirm" :loading="false">确定</el-button>
           <el-button @click="handleCancel">取消</el-button>
         </div>
       </div>
@@ -28,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, withDefaults } from 'vue'
+import { ref, withDefaults, getCurrentInstance, onMounted, onBeforeMount } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -41,7 +39,7 @@ const props = withDefaults(
   },
 )
 const emit = defineEmits(['confirm'])
-
+const instance = getCurrentInstance()
 let isShow = ref(false)
 const confirmLoading = ref<boolean>(false)
 const handleCancel = () => {
@@ -53,6 +51,20 @@ const handleConfirm = () => {
   // confirmLoading.value = false
   // isShow.value = false
 }
+const closeDrawer = () => {
+  isShow.value = false
+}
+const close = () => {
+  isShow.value = false
+}
+onMounted(() => {
+  instance?.proxy?.$mitt.on('close-drawer', close)
+})
+onBeforeMount(() => {
+  instance?.proxy?.$mitt.off('close-drawer', close)
+})
+
+defineExpose({ closeDrawer })
 </script>
 <style lang="less" scoped>
 .drawer-wrapper {
@@ -72,7 +84,7 @@ const handleConfirm = () => {
       }
     }
     .main {
-      background-color: gray;
+      // background-color: gray;
       padding: 10px 10px;
       height: 600px;
       overflow-y: auto;

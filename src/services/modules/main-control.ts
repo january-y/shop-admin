@@ -11,3 +11,9 @@ export const getMainControlInfo3 = (type: string = 'month') => {
     url: 'admin/statistics3?type=' + type,
   })
 }
+
+export const getMainControlInfo2 = () => {
+  return axRequest.get({
+    url: 'admin/statistics2',
+  })
+}

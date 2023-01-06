@@ -68,7 +68,6 @@ const publicStore = usePublicStore()
 const assideRef = ref<HTMLElement>()
 let isClose = ref<boolean>(false)
 const handleItemClick = (index: string, item: any) => {
-  console.log(item.index)
   publicStore.currentMenu = index
   if (homeStore.topTabs.length >= 10) {
     homeStore.topTabs.splice(0, 1)

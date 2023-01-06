@@ -2,7 +2,7 @@
   <div class="home-tabs dfb">
     <div class="left dfs" ref="scollBar">
       <template v-for="(item, index) in homeStore.topTabs" :key="index">
-        <div class="tab dfa" :class="{ active: item.path == $route.path }">
+        <div class="tab dfa" :class="[{ active: item.path == $route.path }]">
           <div class="name cp" @click="handleNavigate(item, index)">{{ item.name }}</div>
           <div class="del tc cp hover" @click="handleDelTab(item)">×</div>
         </div>

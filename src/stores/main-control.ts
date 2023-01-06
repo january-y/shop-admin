@@ -1,14 +1,16 @@
-import { getMainControlInfo3 } from './../services/modules/main-control'
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getMainControlInfo } from '@/services/modules/main-control'
+import {
+  getMainControlInfo,
+  getMainControlInfo2,
+  getMainControlInfo3,
+} from '@/services/modules/main-control'
 
 export const useMainControlStore = defineStore('main-control', () => {
   let currentEchart = ref<string>('month')
   let mainControlInfo = ref<any>()
-  let mainControlInfo3 = ref<any>()
-  let mainControlInfo3Week = ref<any>()
-  let mainControlInfo3Hour = ref<any>()
+  let currentEchartData = ref<any>()
+  let tipsData = ref<any>()
   let iconNavs = ref<any>([
     {
       icon: 'user',
@@ -63,33 +65,26 @@ export const useMainControlStore = defineStore('main-control', () => {
     const res: any = await getMainControlInfo()
     mainControlInfo.value = res.data.panels
   }
-  const getMainControlInfoAction3 = (type?: string) => {
-    getMainControlInfo3(type).then((res: any) => {
-      mainControlInfo3.value = res.data
-    })
+  const getMainControlInfoAction3 = async (time: string = 'month') => {
+    const res: any = await getMainControlInfo3(time)
+    currentEchartData.value = res.data
+    // console.log(currentEchartData.value)
   }
-  const getMainControlInfoAction3Week = (type?: string) => {
-    getMainControlInfo3(type).then((res: any) => {
-      mainControlInfo3Week.value = res.data
-    })
-  }
-  const getMainControlInfoAction3Hour = (type?: string) => {
-    getMainControlInfo3(type).then((res: any) => {
-      mainControlInfo3Hour.value = res.data
-    })
+
+  const getMainControlInfoAction2 = async () => {
+    const res: any = await getMainControlInfo2()
+    tipsData.value = res.data
   }
 
   return {
     mainControlInfo,
-    mainControlInfo3,
-    mainControlInfo3Week,
-    mainControlInfo3Hour,
     iconNavs,
     currentEchart,
+    currentEchartData,
+    tipsData,
     getMainControlInfoAction,
+    getMainControlInfoAction2,
     getMainControlInfoAction3,
-    getMainControlInfoAction3Week,
-    getMainControlInfoAction3Hour,
   }
 })
 

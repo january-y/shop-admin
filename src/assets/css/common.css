@@ -29,6 +29,12 @@ body {
   flex-shrink: 0;
   flex-wrap: nowrap;
 }
+.dfb-s {
+  display: flex;
+  justify-content: space-between;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+}
 .dfa {
   display: flex;
   justify-content: space-around;
@@ -51,6 +57,9 @@ body {
   flex-shrink: 0;
   flex-wrap: nowrap;
 }
+.oc {
+  color: #111111 !important;
+}
 .sc {
   color: var(--second-color) !important;
 }
@@ -70,6 +79,9 @@ body {
   color: skyblue !important;
 }
 .boxs:hover {
-  transition: all 0.1s;
+  transition: all 0.2s;
   box-shadow: 1px 1px 15px #e6e4e4 !important;
+}
+.bgc-fff {
+  background-color: #ffffff !important;
 }

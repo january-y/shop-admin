@@ -6,7 +6,7 @@
       <template v-for="(item, index) in mainControlStore.mainControlInfo" :key="index">
         <div class="panel-item dfcs cp boxs">
           <div class="header dfb">
-            <div class="title fontw sc">{{ item.title }}</div>
+            <div class="title fontw oc">{{ item.title }}</div>
             <div class="year">{{ item.unit }}</div>
           </div>
           <div class="main fontw sc" ref="totalRef">{{ item.value }}</div>
@@ -44,39 +44,46 @@
     <!-- 第二行 -->
     <iconNav :iconData="mainControlStore.iconNavs"></iconNav>
     <!-- 第三行 -->
-    <div class="mainData dfb">
+    <div class="mainData dfb-s">
       <!-- 订单统计 -->
       <div class="left">
-        <orderChart :echartData="echartData" v-if="echartData"></orderChart>
+        <orderChart></orderChart>
       </div>
       <!-- 店铺商品展示 -->
-      <div class="right"></div>
+      <div class="right">
+        <controlGoods
+          :infoData="mainControlStore.tipsData?.goods"
+          v-if="mainControlStore.tipsData?.goods"
+        />
+        <controlTransaction
+          :infoData="mainControlStore.tipsData?.order"
+          v-if="mainControlStore.tipsData?.order"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onActivated, watchEffect, defineAsyncComponent, computed } from 'vue'
+import { ref, onMounted, onActivated, watchEffect, defineAsyncComponent, watch } from 'vue'
 import useMainControlStore from '@/stores/main-control'
 import { useCountUp } from '@/hooks/countUp'
 const iconNav = defineAsyncComponent(() => import('../cpns/iconNavs.vue'))
 const orderChart = defineAsyncComponent(() => import('../cpns/orderEchart.vue'))
+const controlGoods = defineAsyncComponent(() => import('../cpns/control-goods.vue'))
+const controlTransaction = defineAsyncComponent(() => import('../cpns/control-transaction.vue'))
 
 const mainControlStore = useMainControlStore()
 mainControlStore.getMainControlInfoAction()
-mainControlStore.getMainControlInfoAction3()
-mainControlStore.getMainControlInfoAction3Week('week')
-mainControlStore.getMainControlInfoAction3Hour('hour')
+mainControlStore.getMainControlInfoAction2()
 let totalRef = ref<HTMLElement[]>()
-const echartData = computed(() => {
-  return mainControlStore.currentEchart == 'month'
-    ? mainControlStore.mainControlInfo3
-    : mainControlStore.currentEchart == 'week'
-    ? mainControlStore.getMainControlInfoAction3Week
-    : mainControlStore.getMainControlInfoAction3Hour
-})
-console.log(echartData.value)
 
+watch(
+  () => mainControlStore.currentEchart,
+  () => {
+    // console.log(mainControlStore.currentEchart)
+  },
+)
 onMounted(() => {
   totalRef.value?.forEach((item: HTMLElement) => {
     useCountUp(item)
@@ -138,6 +145,11 @@ watchEffect(() => {
     box-sizing: border-box;
     // width: 100%;
     // background-color: red;
+    .right {
+      flex: 1;
+      margin-left: 15px;
+      padding-right: 10px;
+    }
   }
 }
 </style>

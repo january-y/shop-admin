@@ -1,6 +1,6 @@
 <template>
   <div class="category-list">
-    <h2>category-list</h2>
+    <div v-numRoll="20">666</div>
   </div>
 </template>
 
