@@ -1,8 +1,9 @@
 <template>
   <div>
     <div class="dialog-item">
-      <el-dialog :modelValue="dialogVisible" title="提示" width="30%">
+      <el-dialog v-model="dialogVisible" :title="tipTitle" width="30%" :align-center="center">
         <span>{{ tipText }}</span>
+        <input type="text" v-if="showInput" class="input" :value="inputBind" @input="updataFn" />
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="dialogVisible = false">取消</el-button>
@@ -12,7 +13,7 @@
       </el-dialog>
     </div>
     <div @click="dialogVisible = true">
-      <slot :visible="dialogVisible">请传入按钮</slot>
+      <slot>请传入按钮</slot>
     </div>
   </div>
 </template>
@@ -23,28 +24,52 @@ import { ElMessage } from 'element-plus'
 import 'element-plus/es/components/message/style/css'
 
 interface IProps {
+  tipTitle?: string
   tipText?: string
-  confirmFn?: any
+  center?: boolean
+  showInput?: boolean
+  inputBind?: number | string
 }
 const props = withDefaults(defineProps<IProps>(), {
   tipText: '确认信息-tipText',
+  center: false,
+  showInput: false,
+  tipTitle: '提示',
 })
-let dialogVisible = ref(true)
+
+const emit = defineEmits(['confirmFn'])
+const inputValue = ref<any>()
+let dialogVisible = ref(false)
 const handleConfirm = () => {
-  if (props.confirmFn) {
-    props.confirmFn()
-    dialogVisible.value = false
-    ElMessage.success('操作成功!')
+  if (inputValue.value) {
+    emit('confirmFn', inputValue.value.target.value)
+  } else {
+    emit('confirmFn', props.inputBind)
   }
+
   dialogVisible.value = false
 }
+const updataFn = (value: any) => {
+  inputValue.value = value
+}
+const open = () => {
+  dialogVisible.value = true
+}
+
+defineExpose({ open })
 </script>
-<style scoped>
+<style lang="less" scoped>
 .dialog-footer button:first-child {
   margin-right: 10px;
 }
-/* :deep(.el-button.is-text) {
-  background-color: skyblue !important;
-  color: red;
-} */
+.input {
+  padding-left: 10px;
+  width: 100%;
+  height: 30px;
+  border: 2px solid rgb(187, 186, 186);
+  border-radius: 3px;
+  &:focus {
+    outline-color: #79bbff;
+  }
+}
 </style>

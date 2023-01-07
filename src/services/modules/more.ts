@@ -31,3 +31,38 @@ export const delImgCategory = (id: number) => {
     url: `admin/image_class/${id}/delete`,
   })
 }
+
+export const getNowCategoryImgs = (id: number, page: number, limit: number = 10) => {
+  return axRequest.get({
+    url: `admin/image_class/${id}/image/${page}?limit=${limit}`,
+  })
+}
+
+export const editImgName = (id: number, name: number | string) => {
+  return axRequest.post({
+    url: `admin/image/${id}`,
+    data: {
+      id,
+      name,
+    },
+  })
+}
+
+export const delImg = (id: number[]) => {
+  return axRequest.post({
+    url: `admin/image/delete_all`,
+    data: {
+      ids: [...id],
+    },
+  })
+}
+
+export const uploadImg = (imgClassId: number, pathArray: any) => {
+  return axRequest.post({
+    url: 'admin/image/upload',
+    data: {
+      image_class_id: imgClassId,
+      'img[]': [...pathArray],
+    },
+  })
+}

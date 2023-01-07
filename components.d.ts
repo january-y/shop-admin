@@ -7,6 +7,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    copy: typeof import('./src/components/dialog copy.vue')['default']
     Dialog: typeof import('./src/components/dialog.vue')['default']
     Drawer: typeof import('./src/components/drawer.vue')['default']
     DrawerWrapper: typeof import('./src/components/drawer-wrapper.vue')['default']
@@ -43,7 +44,11 @@ declare module '@vue/runtime-core' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    LayoutCol: typeof import('./src/components/layout-col.vue')['default']
     LayoutContain: typeof import('./src/components/layout-contain.vue')['default']
+    LayoutRow: typeof import('./src/components/layout-row.vue')['default']
+    LayoutTable: typeof import('./src/components/layout-table.vue')['default']
+    LayoutTableCol: typeof import('./src/components/layout-table-col.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./src/components/test.vue')['default']
