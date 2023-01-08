@@ -22,7 +22,7 @@ const props = withDefaults(
 .layout-table-col {
   box-sizing: border-box;
   width: 20%;
-  background-color: gray;
-  border: 1px solid skyblue;
+  // background-color: gray;
+  // border: 1px solid skyblue;
 }
 </style>

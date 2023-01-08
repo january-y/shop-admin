@@ -86,8 +86,11 @@ body {
 .cp {
   cursor: pointer;
 }
-.hover:hover {
+.hover-co:hover {
   color: skyblue !important;
+}
+.hover-bg:hover {
+  background-color: #f5f7fa !important;
 }
 .boxs:hover {
   transition: all 0.2s;
@@ -95,4 +98,10 @@ body {
 }
 .bgc-fff {
   background-color: #ffffff !important;
+}
+.width-full {
+  width: 100% !important;
+}
+.text-center {
+  text-align: center !important;
 }

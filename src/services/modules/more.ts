@@ -66,3 +66,36 @@ export const uploadImg = (imgClassId: number, pathArray: any) => {
     },
   })
 }
+
+// 公告
+export const getNotice = (page: number = 1) => {
+  return axRequest.get({
+    url: 'admin/notice/' + page,
+  })
+}
+
+export const editNotice = (id: number, title: any, content: any) => {
+  return axRequest.post({
+    url: `admin/notice/${id}`,
+    data: {
+      title,
+      content,
+    },
+  })
+}
+
+export const newNotice = (title: any, content: any) => {
+  return axRequest.post({
+    url: `admin/notice`,
+    data: {
+      title,
+      content,
+    },
+  })
+}
+
+export const delNotice = (id: number) => {
+  return axRequest.post({
+    url: `admin/notice/${id}/delete`,
+  })
+}

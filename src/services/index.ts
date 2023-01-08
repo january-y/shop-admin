@@ -62,4 +62,31 @@ const mockRequest = new AxRequtst({
   // },
 })
 
-export { axRequest, mockRequest }
+// 数藏
+const hdRequest = new AxRequtst({
+  timeout: 8000,
+  baseURL: '/hd',
+  interceptors: {
+    requestSucessFn: (config: any) => {
+      // console.log("请求成功拦截")
+      return config
+    },
+    requestFailureFn: (err) => {
+      // console.log("请求失败拦截");
+      return err
+    },
+    responseSucessFn: (res) => {
+      // console.log("响应成功拦截");
+      return res
+    },
+    responseFailureFn: (err) => {
+      // console.log("响应失败拦截");
+      return err
+    },
+  },
+  // headers: {
+  //   'content-type': 'application/json',
+  // },
+})
+
+export { axRequest, mockRequest, hdRequest }

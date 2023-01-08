@@ -44,6 +44,7 @@ declare module '@vue/runtime-core' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    HdFly: typeof import('./src/components/hdFly.vue')['default']
     LayoutCol: typeof import('./src/components/layout-col.vue')['default']
     LayoutContain: typeof import('./src/components/layout-contain.vue')['default']
     LayoutRow: typeof import('./src/components/layout-row.vue')['default']
@@ -53,6 +54,7 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./src/components/test.vue')['default']
     Tooltip: typeof import('./src/components/tooltip.vue')['default']
+    UserList: typeof import('./src/components/user-list.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
