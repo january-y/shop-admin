@@ -8,9 +8,12 @@
 
 <style lang="less" scoped>
 .layout-row {
+  box-sizing: border-box;
   flex-wrap: wrap;
   flex-shrink: 0;
-  box-sizing: border-box;
   width: 100%;
+  // &:nth-child(odd) {
+  //   background-color: gray;
+  // }
 }
 </style>

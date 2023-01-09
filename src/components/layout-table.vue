@@ -13,5 +13,8 @@
   box-sizing: border-box;
   width: 100%;
   // background-color: #999999;
+  // &:nth-of-type(odd) {
+  //   background-color: red;
+  // }
 }
 </style>

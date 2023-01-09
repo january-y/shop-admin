@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-col" :style="{ width: colWidth }">
+  <div class="layout-col dfa" :style="{ width: colWidth, justifyContent: aligin }">
     <slot></slot>
   </div>
 </template>
@@ -10,9 +10,11 @@ import { withDefaults } from 'vue'
 const props = withDefaults(
   defineProps<{
     colWidth?: string
+    aligin?: string
   }>(),
   {
     colWidth: '25%',
+    aligin: 'center',
   },
 )
 </script>
@@ -21,5 +23,6 @@ const props = withDefaults(
 .layout-col {
   box-sizing: border-box;
   width: 25%;
+  // border: 1px solid gray;
 }
 </style>
