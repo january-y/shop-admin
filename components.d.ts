@@ -45,6 +45,7 @@ declare module '@vue/runtime-core' {
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
+    ElTree: typeof import('element-plus/es')['ElTree']
     HdFly: typeof import('./src/components/hdFly.vue')['default']
     InputWrapper: typeof import('./src/components/inputWrapper.vue')['default']
     LayoutCol: typeof import('./src/components/layout-col.vue')['default']

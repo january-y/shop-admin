@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, withDefaults, getCurrentInstance, onMounted, onBeforeMount } from 'vue'
+import { ref, withDefaults, getCurrentInstance, onMounted, onBeforeMount, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -38,7 +38,7 @@ const props = withDefaults(
     size: '45%',
   },
 )
-const emit = defineEmits(['confirm'])
+const emit = defineEmits(['confirm', 'drawer-close'])
 const instance = getCurrentInstance()
 let isShow = ref(false)
 const confirmLoading = ref<boolean>(false)
@@ -57,14 +57,23 @@ const closeDrawer = () => {
 const close = () => {
   isShow.value = false
 }
-onMounted(() => {
-  instance?.proxy?.$mitt.on('close-drawer', close)
-})
-onBeforeMount(() => {
-  instance?.proxy?.$mitt.off('close-drawer', close)
-})
+const open = () => {
+  isShow.value = true
+}
+// onMounted(() => {
+//   instance?.proxy?.$mitt.on('close-drawer', close)
+// })
+// onBeforeMount(() => {
+//   instance?.proxy?.$mitt.off('close-drawer', close)
+// })
+watch(
+  () => isShow.value,
+  () => {
+    if (!isShow.value) emit('drawer-close')
+  },
+)
 
-defineExpose({ closeDrawer })
+defineExpose({ closeDrawer, open, close })
 </script>
 <style lang="less" scoped>
 .drawer-wrapper {
