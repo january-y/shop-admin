@@ -60,3 +60,36 @@ export const editManagerStatus = (id: number, status: number) => {
     },
   })
 }
+
+export const getMenuRules = () => {
+  return axRequest.get({
+    url: `admin/rule/1`,
+  })
+}
+
+export const addMenuRules = (
+  rule_id: number,
+  menu: number,
+  name: string | number,
+  method: string,
+  status: number,
+  order: number,
+  icon: string,
+  frontpath: string,
+  condition?: any,
+) => {
+  return axRequest.post({
+    url: `admin/rule`,
+    data: {
+      rule_id,
+      menu,
+      name,
+      condition,
+      method,
+      status,
+      order,
+      icon,
+      frontpath,
+    },
+  })
+}

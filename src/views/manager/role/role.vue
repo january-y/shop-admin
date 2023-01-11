@@ -2,7 +2,7 @@
   <div class="role">
     <div class="table bgc-fff">
       <div class="header dfb">
-        <drawer-wrapper ref="drawerRef" @confirm="handleConfirmNewEdit">
+        <drawer-wrapper ref="drawerRef" @confirm="handleConfirmNewEdit" title="新增">
           <el-button type="primary" size="small" class="pd-8" @click="handleNewRole"
             >新增</el-button
           >
@@ -85,6 +85,7 @@
           ref="drawerPowerRef"
           @confirm="confirmEditPower"
           @drawer-close="treeDrawerClose"
+          title="权限"
         >
           <span></span>
           <template #main>

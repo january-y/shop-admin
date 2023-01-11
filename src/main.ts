@@ -27,9 +27,12 @@ declare module 'vue' {
 const app = createApp(App)
 app.config.globalProperties.$mitt = mitt
 
+let elIcons: any = {}
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
+  elIcons[key] = key
 }
+localStorage.setItem('elIcons', JSON.stringify(elIcons))
 
 app.use(pinia)
 app.use(router)

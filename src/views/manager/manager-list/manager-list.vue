@@ -93,7 +93,7 @@
           </inputWrappter>
           <inputWrappter title-width="70px" title="所属管理">
             <select name="manager" class="managerName" v-model="draweFormInfo.managerName">
-              <option :value="-1" selected>--请选择--</option>
+              <option value="--请选择--" selected>--请选择--</option>
               <template v-for="(item, index) in managerStore?.managerInfo?.roles" :key="item.id">
                 <option :value="item.name">{{ item.name }}</option>
               </template>

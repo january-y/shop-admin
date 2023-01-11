@@ -2,11 +2,17 @@
   <div class="input-wrapper mgt-20">
     <div
       class="title"
-      :style="{ width: titleWidth, justifyContent: titleAligin, alignItems: itemAlign }"
+      :style="{
+        width: titleWidth,
+        justifyContent: titleAligin,
+        alignItems: itemAlign,
+        fontSize: titleSize,
+      }"
     >
       {{ title }}
     </div>
-    <div class="main mgl-10">
+    <div class="main mgl-10 dfs">
+      <slot name="icon"></slot>
       <slot></slot>
     </div>
   </div>
@@ -20,12 +26,14 @@ const props = withDefaults(
     titleWidth?: string
     titleAligin?: string
     itemAlign?: string
+    titleSize?: string
   }>(),
   {
     title: '标题',
     titleWidth: 'auto',
     titleAligin: 'flex-end',
     itemAlign: 'center',
+    titleSize: '15px',
   },
 )
 </script>
