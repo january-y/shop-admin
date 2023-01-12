@@ -103,7 +103,6 @@
       </div>
     </div>
     <!-- 页脚 -->
-    <div class="footer" @click="currentData = []">111111111111111</div>
   </div>
 </template>
 

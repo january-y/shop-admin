@@ -68,8 +68,8 @@ export const getMenuRules = () => {
 }
 
 export const addMenuRules = (
-  rule_id: number,
-  menu: number,
+  rule_id: number | string,
+  menu: number | string,
   name: string | number,
   method: string,
   status: number,
@@ -90,6 +90,48 @@ export const addMenuRules = (
       order,
       icon,
       frontpath,
+    },
+  })
+}
+
+export const delMenuRule = (id: number) => {
+  return axRequest.post({
+    url: `admin/rule/${id}/delete`,
+  })
+}
+
+export const editMenuRule = (
+  rule_id: number | string,
+  menu: number | string,
+  name: string | number,
+  method: string,
+  status: number | string,
+  order: number | string,
+  icon: string,
+  frontpath: string,
+  condition?: any,
+) => {
+  return axRequest.post({
+    url: `aadmin/rule/193`,
+    data: {
+      rule_id,
+      menu,
+      name,
+      condition,
+      method,
+      status,
+      order,
+      icon,
+      frontpath,
+    },
+  })
+}
+
+export const EditMenuStatus = (id: number, status: number) => {
+  return axRequest.post({
+    url: `admin/rule/${id}/update_status`,
+    data: {
+      status,
     },
   })
 }

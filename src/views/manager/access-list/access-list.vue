@@ -19,7 +19,10 @@
                 <div>{{ node.label }}</div>
               </div>
               <div class="handle dfa">
-                <el-switch :modelValue="true" />
+                <el-switch
+                  :modelValue="data.status ? true : false"
+                  @change="handleSwitchChange($event, data.id)"
+                />
                 <div class="fontc" @click="handleEditRule(node, data)">修改</div>
                 <div class="fontc" @click="handleAddRule(node, data)">增加</div>
                 <el-popconfirm title="是否要删除?" @confirm="confirmDel">
@@ -147,7 +150,14 @@
 <script setup lang="ts">
 import { ref, defineAsyncComponent, reactive, watch } from 'vue'
 import useManagerStore from '@/stores/manager'
-import { getMenuRules, getMagagerList, addMenuRules } from '@/services/modules/manager'
+import {
+  getMenuRules,
+  getMagagerList,
+  addMenuRules,
+  delMenuRule,
+  editMenuRule,
+  EditMenuStatus,
+} from '@/services/modules/manager'
 import { useMessage } from '@/utils/useMessage'
 const drawerWrapper = defineAsyncComponent(() => import('@/components/drawer-wrapper.vue'))
 const inputWrappter = defineAsyncComponent(() => import('@/components/inputWrapper.vue'))
@@ -273,11 +283,26 @@ const ConfirmNewEdit = () => {
     )
       .then((res: any) => {
         useMessage('success', '添加成功')
+        getData()
+        drawerRef.value.close()
       })
-      .finally(() => {
+      .catch(() => {
         useMessage('error', '添加失败')
       })
-
+  drawerFormInfo.handleTitle == '修改' &&
+    editMenuRule(
+      currentItemInfo.currentNewRuleId + '',
+      currentItemInfo.currentNewMenu + '',
+      drawerFormInfo.name + '',
+      drawerFormInfo.method + '',
+      currentItemInfo.currentNewStatus + '',
+      drawerFormInfo.sort + '',
+      drawerFormInfo.icon + '',
+      currentItemInfo.frontpath + '',
+      drawerFormInfo.backEnd + '',
+    ).then((res: any) => {
+      console.log(res)
+    })
   console.log('confirmHandle')
 }
 const handleSelectChange = (e: any) => {
@@ -315,7 +340,18 @@ const onDrawerClose = () => {
   useResetForm()
 }
 const confirmDel = () => {
-  console.log('confirmDel')
+  delMenuRule(currentItemInfo.item.id)
+    .then(() => {
+      useMessage('success', '删除成功')
+      getData()
+    })
+    .catch(() => useMessage('error', '删除失败'))
+}
+const handleSwitchChange = (e: boolean, id: number) => {
+  EditMenuStatus(id, e ? 1 : 0).then((res: any) => {
+    useMessage('success', '修改成功')
+    getData()
+  })
 }
 
 //
