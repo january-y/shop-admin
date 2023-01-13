@@ -108,7 +108,6 @@ import { ref, reactive, defineAsyncComponent, nextTick } from 'vue'
 import { ElTable } from 'element-plus'
 import useSkuStore from '@/stores/skus'
 import { useRouter } from 'vue-router'
-import 'element-plus/dist/index.css'
 import { addSkus, delMuchSkus, editSKuStatus, editSKusInfo } from '@/services/modules/skus'
 import { useMessage } from '@/utils/useMessage'
 const drawerWrapper = defineAsyncComponent(() => import('@/components/drawer-wrapper.vue'))
