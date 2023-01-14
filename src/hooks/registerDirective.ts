@@ -241,7 +241,9 @@ export const registerDirectiveFocus = (app: any) => {
       }
       // other
       if (flag && binding.value.status == 1 && binding.value.used <= binding.value.total) {
-        el.style.backgroundColor = '#fff1f2'
+        el.style.backgroundColor = '#FFF1F2'
+        el.style.color = '#F87171'
+        el.style.fontWeight = '900'
       }
       //结束
       el.style.display = 'block'
