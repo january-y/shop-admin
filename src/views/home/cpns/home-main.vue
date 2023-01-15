@@ -40,6 +40,8 @@ const route = useRoute()
     // width: 100%;
   }
   .view {
+    height: calc(100vh - 70px);
+    overflow-y: auto;
     margin-top: 10px;
     padding-left: 10px;
   }

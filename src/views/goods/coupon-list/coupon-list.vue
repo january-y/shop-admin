@@ -165,7 +165,7 @@
         <el-pagination
           background
           layout="prev, pager, next"
-          :total="1000"
+          :total="couponStore.couponInfos?.totalCount"
           @next-click="handlleNext"
           @prev-click="handlePrev"
           @current-change="handlePageChange"
