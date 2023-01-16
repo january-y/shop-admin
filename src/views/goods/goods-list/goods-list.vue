@@ -7,6 +7,113 @@
         </template>
       </el-tabs>
     </div>
+    <!-- drawer -->
+    <drawer-wrapper
+      ref="drawerNewEditRef"
+      @confirm="drawerNewEditConfirm"
+      @drawer-close="handleNewEditClose"
+      :title="currentInfo.drawerTitle"
+    >
+      <template #default>
+        <span></span>
+      </template>
+      <template #main>
+        <div class="main">
+          <el-form
+            ref="ruleFormRef"
+            :model="drawerAddEditForm"
+            status-icon
+            :rules="rules"
+            label-width="120px"
+            class="demo-ruleForm"
+          >
+            <el-form-item label="商品名称" prop="title">
+              <el-input
+                v-model="drawerAddEditForm.title"
+                type="text"
+                autocomplete="off"
+                placeholder="请输入商品名称，不能超过60个字符"
+              />
+            </el-form-item>
+            <el-form-item label="封面" prop="cover">
+              <img class="img" :src="drawerAddEditForm.cover" v-if="showCover" ref="coverRef" />
+              <div class="addbox dfc cp" @click="handleUpload">+</div>
+            </el-form-item>
+            <el-form-item label="商品分类" prop="category_id">
+              <el-select v-model="drawerAddEditForm.category_id" placeholder="请选择商品分类">
+                <template v-for="(item, index) in goodsStore.categorySelectList" :key="item.id">
+                  <el-option :label="item.name" :value="item.id" />
+                </template>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="商品描述" prop="desc">
+              <el-input
+                v-model="drawerAddEditForm.desc"
+                type="textarea"
+                autocomplete="off"
+                placeholder="选填，商品卖点描述"
+              />
+            </el-form-item>
+            <el-form-item label="商品单位" prop="unit">
+              <div class="width-50">
+                <el-input v-model="drawerAddEditForm.unit" type="text" autocomplete="off" />
+              </div>
+            </el-form-item>
+            <el-form-item label="总库存" prop="stock">
+              <div class="width-40">
+                <el-input v-model="drawerAddEditForm.stock">
+                  <template #append>件</template>
+                </el-input>
+              </div>
+            </el-form-item>
+            <el-form-item label="库存预警" prop="min_stock">
+              <div class="width-40">
+                <el-input v-model="drawerAddEditForm.min_stock">
+                  <template #append>件</template>
+                </el-input>
+              </div>
+            </el-form-item>
+            <el-form-item label="最低销售价" prop="min_price">
+              <div class="width-40">
+                <el-input v-model="drawerAddEditForm.min_price">
+                  <template #append>元</template>
+                </el-input>
+              </div>
+            </el-form-item>
+            <el-form-item label="最低原价" prop="min_oprice">
+              <div class="width-40">
+                <el-input v-model="drawerAddEditForm.min_oprice">
+                  <template #append>元</template>
+                </el-input>
+              </div>
+            </el-form-item>
+            <el-form-item label="库存显示" prop="stock_display">
+              <el-radio-group v-model="drawerAddEditForm.stock_display">
+                <el-radio :label="1" border>是</el-radio>
+                <el-radio :label="0" border>否</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="是否上架" prop="status">
+              <el-radio-group v-model="drawerAddEditForm.status">
+                <el-radio :label="0" border>放入仓库</el-radio>
+                <el-radio :label="1" border>立即上架</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-form>
+        </div>
+      </template>
+    </drawer-wrapper>
+    <!-- layout-contain -->
+    <div class="select-img" ref="selectImgRef">
+      <div class="close" @click="selectImgRef!.style.display = 'none'">×</div>
+      <div class="contain dfc">
+        <layout-contain>
+          <template #header>
+            <div>图片选择</div>
+          </template>
+        </layout-contain>
+      </div>
+    </div>
     <!-- table -->
     <div class="table">
       <div class="table-header">
@@ -54,8 +161,12 @@
         </div>
         <div class="main-handle dfb">
           <div class="left">
-            <el-button type="primary" size="small">新增</el-button>
-            <el-button type="danger" size="small">批量删除</el-button>
+            <el-button type="primary" size="small" @click="handleNewClick">新增</el-button>
+            <el-popconfirm title="是否要删除？" @confirm="handleDelGoods">
+              <template #reference>
+                <el-button type="danger" size="small">批量删除</el-button>
+              </template>
+            </el-popconfirm>
             <el-button size="small">上架</el-button>
             <el-button size="small">下架</el-button>
           </div>
@@ -65,7 +176,7 @@
         </div>
       </div>
       <div class="table-main mgt-20">
-        <el-table ref="multipleTableRef" :data="goodsStore.goodList" style="width: 100%">
+        <el-table ref="tableRef" :data="goodsStore.goodList" style="width: 100%">
           <el-table-column type="selection" width="45" />
           <el-table-column label="商品" width="300">
             <template #default="scope">
@@ -109,11 +220,17 @@
           <el-table-column label="操作" align="right">
             <template #default="scope">
               <div class="dfe">
-                <span class="mgr-20 small fontc underline cp">修改</span>
+                <span class="mgr-20 small fontc underline cp" @click="handleEdit(scope.row)"
+                  >修改</span
+                >
                 <span class="mgr-20 small fontc underline cp">商品规格</span>
                 <span class="mgr-20 small fontc underline cp">设置轮播图</span>
                 <span class="mgr-20 small fontc underline cp">商品详情</span>
-                <span class="small fontc underline cp">删除</span>
+                <el-popconfirm title="是否要删除?" @confirm="handleDelGood(scope.row.id)">
+                  <template #reference>
+                    <span class="small fontc underline cp">删除</span>
+                  </template>
+                </el-popconfirm>
               </div>
             </template>
           </el-table-column>
@@ -135,7 +252,12 @@
 <script setup lang="ts">
 import { ref, reactive, defineAsyncComponent, watch } from 'vue'
 import useGoodsStore from '@/stores/goods'
+import { useIsNumber } from '@/utils/useCheckTypeof'
+import type { FormInstance } from 'element-plus'
+import { addGood, editGoods, delGoodsByIds } from '@/services/modules/goods'
+import { useMessage } from '@/utils/useMessage'
 const drawerWrapper = defineAsyncComponent(() => import('@/components/drawer-wrapper.vue'))
+const layoutContain = defineAsyncComponent(() => import('@/components/layout-contain.vue'))
 
 const goodsStore = useGoodsStore()
 goodsStore.getGoodInfosAction(1, {
@@ -143,6 +265,10 @@ goodsStore.getGoodInfosAction(1, {
 })
 // ref
 const drawerNewEditRef = ref<InstanceType<typeof drawerWrapper>>()
+const coverRef = ref<HTMLImageElement>()
+const ruleFormRef = ref<FormInstance>()
+const selectImgRef = ref<HTMLElement>()
+const tableRef = ref<any>()
 // variable
 interface ICurrentInfo {
   tab: string
@@ -150,6 +276,21 @@ interface ICurrentInfo {
   selectCategory: string
   page: number
   searchGoodName: string | number
+  drawerTitle: string
+  item: any
+}
+interface IDrawerAddEditForm {
+  title: string
+  category_id: number
+  cover: string
+  desc: string
+  unit: string
+  stock: number
+  min_stock: number
+  status: number
+  stock_display: number
+  min_price: number
+  min_oprice: number
 }
 const currentInfo = reactive<ICurrentInfo>({
   tab: 'all',
@@ -157,7 +298,24 @@ const currentInfo = reactive<ICurrentInfo>({
   selectCategory: '',
   page: 1,
   searchGoodName: '',
+  drawerTitle: '新增',
+  item: '',
 })
+const drawerAddEditForm = reactive<IDrawerAddEditForm>({
+  title: '',
+  category_id: 5,
+  cover:
+    'https://img0.baidu.com/it/u=2652437070,1782133479&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
+  desc: '',
+  unit: '件',
+  stock: 100,
+  min_stock: 10,
+  status: 1,
+  stock_display: 1,
+  min_price: 0,
+  min_oprice: 0,
+})
+const showCover = ref<boolean>(false)
 const tabList = ref<any>([
   { key: 'all', title: '全部' },
   { key: 'checking', title: '审核中' },
@@ -166,11 +324,79 @@ const tabList = ref<any>([
   { key: 'min_stock', title: '库存预警' },
   { key: 'delete', title: '回收站' },
 ])
+const rules = reactive({
+  title: [{ validator: validateTitle, trigger: 'blur' }],
+  category_id: [{ required: true, trigger: 'blur' }],
+  desc: [{ validator: validateDesc, trigger: 'blur' }],
+  unit: [{ validator: validateTitle, trigger: 'blur' }],
+  stock: [{ required: true, trigger: 'blur' }],
+  min_stock: [{ required: true, trigger: 'blur' }],
+  status: [{ required: true, trigger: 'blur' }],
+  stock_display: [{ required: true, trigger: 'blur' }],
+  min_price: [{ required: true, trigger: 'blur' }],
+  min_oprice: [{ required: true, trigger: 'blur' }],
+})
 // hooks
+function validateTitle(rule: any, value: any, callback: any) {
+  if (!value || value.replace(/\s*/g, '').length < 1) {
+    callback(new Error('该项不能为空'))
+  } else {
+    callback()
+  }
+}
+function validateDesc(rule: any, value: any, callback: any) {
+  if (!value || value.replace(/\s*/g, '').length < 3) {
+    callback(new Error('商品描述需在3个字符以上'))
+  } else {
+    callback()
+  }
+}
+function validateStock(rule: any, value: any, callback: any) {
+  if (!useIsNumber(value) || value < 1) {
+    callback(new Error('商品库存至少为1'))
+  } else {
+    callback()
+  }
+}
+function validateMinStock(rule: any, value: any, callback: any) {
+  if (!useIsNumber(value) || value < 0) {
+    callback(new Error('库存预警至少为0'))
+  } else {
+    callback()
+  }
+}
+function validateMinPrice(rule: any, value: any, callback: any) {
+  if (!useIsNumber(value) || value < 0) {
+    callback(new Error('最低销售价至少为0'))
+  } else {
+    callback()
+  }
+}
+function validateMinOprice(rule: any, value: any, callback: any) {
+  if (!useIsNumber(value) || value < 0) {
+    callback(new Error('最低原价至少为0'))
+  } else {
+    callback()
+  }
+}
 function getData() {
   goodsStore.getGoodInfosAction(1, {
     tab: 'all',
   })
+}
+function resetForm() {
+  drawerAddEditForm.title = ''
+  drawerAddEditForm.category_id = 5
+  drawerAddEditForm.cover =
+    'https://img0.baidu.com/it/u=2652437070,1782133479&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500'
+  drawerAddEditForm.desc = ''
+  drawerAddEditForm.unit = '件'
+  drawerAddEditForm.stock = 100
+  drawerAddEditForm.min_stock = 10
+  drawerAddEditForm.status = 1
+  drawerAddEditForm.stock_display = 1
+  drawerAddEditForm.min_price = 0
+  drawerAddEditForm.min_oprice = 0
 }
 const handleTabChange = (tabName: string) => {
   // 发送相关网络请求
@@ -199,6 +425,104 @@ const handleResetSearch = () => {
   currentInfo.selectCategory = ''
   getData()
 }
+const handleUpload = () => {
+  selectImgRef.value!.style.display = 'block'
+}
+// 抽屉
+const handleNewEditClose = () => {
+  resetForm()
+  ruleFormRef.value?.resetFields()
+}
+const drawerNewEditConfirm = () => {
+  ruleFormRef.value?.validate((e: boolean) => {
+    // 新增
+    if (currentInfo.drawerTitle == '新增') {
+      // 验证表单输入
+      if (
+        drawerAddEditForm.category_id &&
+        drawerAddEditForm.cover &&
+        drawerAddEditForm.desc &&
+        drawerAddEditForm.min_oprice &&
+        drawerAddEditForm.min_price &&
+        drawerAddEditForm.min_stock &&
+        drawerAddEditForm.stock &&
+        drawerAddEditForm.title &&
+        drawerAddEditForm.unit
+      ) {
+        addGood(drawerAddEditForm).then((res: any) => {
+          useMessage('success', '添加成功')
+          getData()
+          drawerNewEditRef.value?.close()
+        })
+      } else {
+        useMessage('error', '信息填写错误')
+      }
+    } else {
+      // 修改
+      if (
+        drawerAddEditForm.category_id &&
+        drawerAddEditForm.cover &&
+        drawerAddEditForm.desc &&
+        drawerAddEditForm.min_oprice &&
+        drawerAddEditForm.min_price &&
+        drawerAddEditForm.min_stock &&
+        drawerAddEditForm.stock &&
+        drawerAddEditForm.title &&
+        drawerAddEditForm.unit
+      ) {
+        editGoods(currentInfo.item.id, { ...drawerAddEditForm, content: '芜湖起飞' }).then(
+          (res: any) => {
+            useMessage('success', '修改成功')
+            getData()
+            drawerNewEditRef.value?.close()
+          },
+        )
+      } else {
+        useMessage('error', '信息填写错误')
+      }
+    }
+  })
+}
+const handleNewClick = () => {
+  currentInfo.drawerTitle = '新增'
+  drawerNewEditRef.value?.open()
+}
+const handleEdit = (item: any) => {
+  currentInfo.item = item
+  currentInfo.drawerTitle = '修改'
+  //
+  drawerAddEditForm.category_id = item.category_id
+  drawerAddEditForm.cover = item.cover
+  drawerAddEditForm.desc = item.desc
+  drawerAddEditForm.min_oprice = item.min_oprice
+  drawerAddEditForm.min_price = item.min_price
+  drawerAddEditForm.min_stock = item.min_stock
+  drawerAddEditForm.status = item.status
+  drawerAddEditForm.stock = item.stock
+  drawerAddEditForm.stock_display = item.stock_display
+  drawerAddEditForm.title = item.title
+  drawerAddEditForm.unit = item.unit
+  //
+  drawerNewEditRef.value?.open()
+  showCover.value = true
+}
+const handleDelGoods = () => {
+  const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
+  delGoodsByIds(ids)
+    .then((res: any) => {
+      useMessage('success', '删除成功')
+      getData()
+    })
+    .catch(() => useMessage('error', '删除失败'))
+}
+const handleDelGood = (id: number) => {
+  delGoodsByIds([id])
+    .then((res: any) => {
+      useMessage('success', '删除成功')
+      getData()
+    })
+    .catch(() => useMessage('error', '删除失败'))
+}
 
 //
 watch(
@@ -224,6 +548,40 @@ watch(
     background-color: #ffffff;
   }
   .footer {
+  }
+  .main {
+    margin-top: 30px;
+    margin-left: -50px;
+    .img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+    .addbox {
+      width: 100px;
+      height: 100px;
+      font-size: 35px;
+      color: #999999;
+      border: 1px dashed #dad9d9;
+    }
+  }
+}
+.select-img {
+  display: none;
+  position: fixed;
+  z-index: 999999999;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  .close {
+    top: 30px;
+    right: 150px;
+    position: absolute;
+    font-size: 100px;
+    color: #9d9c9c;
+    cursor: pointer;
   }
 }
 .table {

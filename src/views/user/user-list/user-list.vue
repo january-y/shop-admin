@@ -8,8 +8,6 @@
 
 <style lang="less" scoped>
 .user-list {
-  .box {
-    margin-top: 50px;
-  }
+  color: skyblue;
 }
 </style>

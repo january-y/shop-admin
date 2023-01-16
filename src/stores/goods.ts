@@ -12,12 +12,16 @@ interface IInfos {
 const useGoodsStore = defineStore('goods', () => {
   let goodInfos = ref<any>(null)
   let goodList = ref<any>(null)
+  let categorySelectList = ref<any>(null)
   const getGoodInfosAction = async (page: number, params: IInfos) => {
     const res: any = await getGoodInfos(page, params)
     goodInfos.value = res.data
     goodList.value = res.data.list
+    categorySelectList.value = res.data.cates.map((item: any) => {
+      return { id: item.id, name: item.name }
+    })
   }
-  return { goodInfos, goodList, getGoodInfosAction }
+  return { goodInfos, goodList, categorySelectList, getGoodInfosAction }
 })
 
 export default useGoodsStore

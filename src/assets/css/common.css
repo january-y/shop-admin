@@ -147,6 +147,12 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.width-50 {
+  width: 50% !important;
+}
+.width-40 {
+  width: 40% !important;
+}
 .mgt-10 {
   margin-top: 10px;
 }

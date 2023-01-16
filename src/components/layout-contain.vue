@@ -13,7 +13,7 @@
               <slot name="asside"> asside部分 </slot>
             </div>
           </div>
-          <div class="toggle dfc">
+          <div class="toggle dfc" :style="{ height: assidetogglePage }">
             <slot name="astoggle"> asside-toggle部分 </slot>
           </div>
         </el-aside>
@@ -21,9 +21,10 @@
           <div class="main page" :style="{ height: mainHeight }">
             <slot name="main"> main部分 </slot>
           </div>
-          <div class="toggle-page dfc">
+          <div class="toggle-page dfc" :style="{ height: maintogglePage }">
             <slot name="maintoggle"> main-toggle部分 </slot>
           </div>
+          <slot name="main-footer"></slot>
         </el-main>
       </el-container>
     </el-container>
@@ -39,12 +40,16 @@ const props = withDefaults(
     assideHeight?: string
     mainHeight?: string
     asideWidth?: string
+    maintogglePage: string
+    assidetogglePage: string
   }>(),
   {
     headerHeight: '60px',
     assideHeight: 'calc(100vh - 250px)',
     mainHeight: 'calc(100vh - 250px)',
     asideWidth: '230px',
+    maintogglePage: '40px',
+    assidetogglePage: '40px',
   },
 )
 </script>

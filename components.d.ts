@@ -63,6 +63,7 @@ declare module '@vue/runtime-core' {
     LayoutTableCol: typeof import('./src/components/layout-table-col.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectImgs: typeof import('./src/components/select-imgs.vue')['default']
     Test: typeof import('./src/components/test.vue')['default']
     Tooltip: typeof import('./src/components/tooltip.vue')['default']
     UserList: typeof import('./src/components/user-list.vue')['default']
