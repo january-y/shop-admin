@@ -7,7 +7,7 @@
         </template>
       </el-tabs>
     </div>
-    <!-- drawer -->
+    <!-- goods-drawer -->
     <drawer-wrapper
       ref="drawerNewEditRef"
       @confirm="drawerNewEditConfirm"
@@ -36,7 +36,7 @@
               />
             </el-form-item>
             <el-form-item label="封面" prop="cover">
-              <img class="img" :src="drawerAddEditForm.cover" v-if="showCover" ref="coverRef" />
+              <img class="img" :src="drawerAddEditForm.cover" v-if="drawerAddEditForm.cover" />
               <div class="addbox dfc cp" @click="handleUpload">+</div>
             </el-form-item>
             <el-form-item label="商品分类" prop="category_id">
@@ -103,15 +103,61 @@
         </div>
       </template>
     </drawer-wrapper>
+    <!-- banners-drawer -->
+    <drawer-wrapper
+      @confirm="handleBannersConfirm"
+      @drawer-close="handleBannersDrawerClose"
+      ref="bannersDrawerRef"
+      :title="currentInfo.bannerDrawerTitle"
+    >
+      <template #default>
+        <span></span>
+      </template>
+      <template #main>
+        <div class="banners-main">
+          <div class="title">轮播图</div>
+          <div class="box dfs">
+            <template v-for="(item, index) in currentInfo.checkedBanners" :key="item.id">
+              <div class="img-contain">
+                <img
+                  :src="item.url"
+                  alt=""
+                  class="banner-img"
+                  v-if="currentInfo.checkedBanners.length > 0"
+                />
+                <div class="img-close" @click="handleDelBanner(item.id)">×</div>
+              </div>
+            </template>
+            <div class="addbox dfc" @click="handleSelectBanners">+</div>
+          </div>
+        </div>
+      </template>
+    </drawer-wrapper>
+    <!-- banners图片选择组件 -->
+    <transition name="fade">
+      <select-imgs
+        ref="selectBannersRef"
+        @confirm-select="handleSelectBannersConfirm"
+        :img-count="999"
+      ></select-imgs>
+    </transition>
+    <!-- goods图片选择组件 -->
+    <transition name="fade">
+      <select-imgs
+        ref="selectImgsRef"
+        @confirm-select="handleSelectConfirm"
+        :img-count="1"
+      ></select-imgs>
+    </transition>
     <!-- layout-contain -->
     <div class="select-img" ref="selectImgRef">
       <div class="close" @click="selectImgRef!.style.display = 'none'">×</div>
       <div class="contain dfc">
-        <layout-contain>
+        <!-- <layout-contain>
           <template #header>
             <div>图片选择</div>
           </template>
-        </layout-contain>
+        </layout-contain> -->
       </div>
     </div>
     <!-- table -->
@@ -167,8 +213,8 @@
                 <el-button type="danger" size="small">批量删除</el-button>
               </template>
             </el-popconfirm>
-            <el-button size="small">上架</el-button>
-            <el-button size="small">下架</el-button>
+            <el-button size="small" @click="handlePutOnGoods">上架</el-button>
+            <el-button size="small" @click="handlePutDownGoods">下架</el-button>
           </div>
           <div class="right">
             <el-icon class="cp"><Refresh @click="getData" /></el-icon>
@@ -211,8 +257,8 @@
               <div v-if="scope.row.ischeck == 1" class="dfc">通过</div>
               <div v-else-if="scope.row.ischeck == 2" class="dfc">拒绝</div>
               <div v-else class="dfc">
-                <div class="checkTrue cp">审核成功</div>
-                <div class="checkFalse cp">审核失败</div>
+                <div class="checkTrue cp" @click="handleCheckTrue(scope.row.id)">审核成功</div>
+                <div class="checkFalse cp" @click="handleCheckFalse(scope.row.id)">审核失败</div>
               </div>
             </template>
           </el-table-column>
@@ -224,7 +270,9 @@
                   >修改</span
                 >
                 <span class="mgr-20 small fontc underline cp">商品规格</span>
-                <span class="mgr-20 small fontc underline cp">设置轮播图</span>
+                <span class="mgr-20 small fontc underline cp" @click="handleSetBanners(scope.row)"
+                  >设置轮播图</span
+                >
                 <span class="mgr-20 small fontc underline cp">商品详情</span>
                 <el-popconfirm title="是否要删除?" @confirm="handleDelGood(scope.row.id)">
                   <template #reference>
@@ -254,8 +302,16 @@ import { ref, reactive, defineAsyncComponent, watch } from 'vue'
 import useGoodsStore from '@/stores/goods'
 import { useIsNumber } from '@/utils/useCheckTypeof'
 import type { FormInstance } from 'element-plus'
-import { addGood, editGoods, delGoodsByIds } from '@/services/modules/goods'
+import {
+  addGood,
+  editGoods,
+  delGoodsByIds,
+  putOnOrDownGoods,
+  checkGood,
+  setGoodsBanners,
+} from '@/services/modules/goods'
 import { useMessage } from '@/utils/useMessage'
+const selectImgs = defineAsyncComponent(() => import('@/components/select-imgs.vue'))
 const drawerWrapper = defineAsyncComponent(() => import('@/components/drawer-wrapper.vue'))
 const layoutContain = defineAsyncComponent(() => import('@/components/layout-contain.vue'))
 
@@ -265,10 +321,13 @@ goodsStore.getGoodInfosAction(1, {
 })
 // ref
 const drawerNewEditRef = ref<InstanceType<typeof drawerWrapper>>()
-const coverRef = ref<HTMLImageElement>()
+// const coverRef = ref<HTMLImageElement>()
 const ruleFormRef = ref<FormInstance>()
 const selectImgRef = ref<HTMLElement>()
 const tableRef = ref<any>()
+const selectImgsRef = ref<InstanceType<typeof selectImgs>>()
+const bannersDrawerRef = ref<InstanceType<typeof drawerWrapper>>()
+const selectBannersRef = ref<InstanceType<typeof selectImgs>>()
 // variable
 interface ICurrentInfo {
   tab: string
@@ -278,6 +337,8 @@ interface ICurrentInfo {
   searchGoodName: string | number
   drawerTitle: string
   item: any
+  bannerDrawerTitle: string
+  checkedBanners: any
 }
 interface IDrawerAddEditForm {
   title: string
@@ -300,12 +361,13 @@ const currentInfo = reactive<ICurrentInfo>({
   searchGoodName: '',
   drawerTitle: '新增',
   item: '',
+  bannerDrawerTitle: '设置轮播图',
+  checkedBanners: [],
 })
 const drawerAddEditForm = reactive<IDrawerAddEditForm>({
   title: '',
   category_id: 5,
-  cover:
-    'https://img0.baidu.com/it/u=2652437070,1782133479&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
+  cover: '',
   desc: '',
   unit: '件',
   stock: 100,
@@ -315,7 +377,6 @@ const drawerAddEditForm = reactive<IDrawerAddEditForm>({
   min_price: 0,
   min_oprice: 0,
 })
-const showCover = ref<boolean>(false)
 const tabList = ref<any>([
   { key: 'all', title: '全部' },
   { key: 'checking', title: '审核中' },
@@ -387,8 +448,7 @@ function getData() {
 function resetForm() {
   drawerAddEditForm.title = ''
   drawerAddEditForm.category_id = 5
-  drawerAddEditForm.cover =
-    'https://img0.baidu.com/it/u=2652437070,1782133479&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500'
+  drawerAddEditForm.cover = ''
   drawerAddEditForm.desc = ''
   drawerAddEditForm.unit = '件'
   drawerAddEditForm.stock = 100
@@ -426,7 +486,8 @@ const handleResetSearch = () => {
   getData()
 }
 const handleUpload = () => {
-  selectImgRef.value!.style.display = 'block'
+  // selectImgRef.value!.style.display = 'block'
+  selectImgsRef.value?.open()
 }
 // 抽屉
 const handleNewEditClose = () => {
@@ -504,7 +565,6 @@ const handleEdit = (item: any) => {
   drawerAddEditForm.unit = item.unit
   //
   drawerNewEditRef.value?.open()
-  showCover.value = true
 }
 const handleDelGoods = () => {
   const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
@@ -523,6 +583,77 @@ const handleDelGood = (id: number) => {
     })
     .catch(() => useMessage('error', '删除失败'))
 }
+const handleSelectConfirm = (e: any) => {
+  drawerAddEditForm.cover = e[0].url
+}
+const handlePutOnGoods = () => {
+  const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
+  putOnOrDownGoods(ids, 1)
+    .then((res: any) => {
+      useMessage('success', '上架成功')
+      getData()
+    })
+    .catch(() => useMessage('error', '上架失败'))
+}
+const handlePutDownGoods = () => {
+  const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
+  putOnOrDownGoods(ids, 0)
+    .then((res: any) => {
+      useMessage('success', '下架成功')
+      getData()
+    })
+    .catch(() => useMessage('error', '下架失败'))
+}
+const handleCheckTrue = (id: number) => {
+  checkGood(id, 1)
+    .then((res: any) => {
+      useMessage('success', '已通过')
+    })
+    .catch(() => useMessage('error', '操作失败'))
+}
+const handleCheckFalse = (id: number) => {
+  checkGood(id, 2)
+    .then((res: any) => {
+      useMessage('success', '已拒绝')
+    })
+    .catch(() => useMessage('error', '操作失败'))
+}
+const handleSetBanners = (item: any) => {
+  currentInfo.item = item
+  currentInfo.checkedBanners = []
+  item['goods_banner'].forEach((item2: any) => {
+    currentInfo.checkedBanners.push({ id: item2.id, url: item2.url })
+  })
+  bannersDrawerRef.value?.open()
+}
+const handleBannersConfirm = () => {
+  setGoodsBanners(
+    currentInfo.item.id,
+    currentInfo.checkedBanners.map((res: any) => res.url),
+  )
+    .then((res: any) => {
+      useMessage('success', '设置成功')
+      getData()
+      bannersDrawerRef.value?.close()
+    })
+    .catch(() => useMessage('error', '设置失败'))
+  console.log('handleBannersConfirm')
+}
+const handleBannersDrawerClose = () => {
+  currentInfo.checkedBanners = []
+}
+const handleSelectBanners = () => {
+  selectBannersRef.value?.open()
+}
+const handleSelectBannersConfirm = (e: any) => {
+  e.forEach((res: any) => {
+    currentInfo.checkedBanners.push({ id: res.id, url: res.url })
+  })
+}
+const handleDelBanner = (id: number) => {
+  const res = currentInfo.checkedBanners.findIndex((item: any) => item.id == id)
+  if (res !== -1) currentInfo.checkedBanners.splice(res, 1)
+}
 
 //
 watch(
@@ -540,6 +671,7 @@ watch(
   padding-right: 20px;
   width: 100%;
   border-radius: 5px;
+  transition: all 0.5s;
   .tabs {
   }
   .table {
@@ -563,6 +695,56 @@ watch(
       font-size: 35px;
       color: #999999;
       border: 1px dashed #dad9d9;
+    }
+  }
+  .banners-main {
+    display: flex;
+    justify-content: start;
+    box-sizing: border-box;
+    margin-top: 30px;
+    .title {
+      margin-right: 10px;
+      height: 100px;
+    }
+    .box {
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      width: 440px;
+      .banner-img {
+        margin-top: 10px;
+        margin-left: 10px;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+      }
+      .addbox {
+        margin-top: 10px;
+        margin-left: 10px;
+        width: 100px;
+        height: 100px;
+        font-size: 45px;
+        color: #bcbcbc;
+        border: 1px dashed #bab9b9;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .img-contain {
+        position: relative;
+        .img-close {
+          position: absolute;
+          right: 10px;
+          top: 15px;
+          text-align: center;
+          line-height: 15px;
+          font-size: 18px;
+          height: 15px;
+          width: 15px;
+          color: #999999;
+          border: 1px solid #999999;
+          cursor: pointer;
+          border-radius: 50%;
+        }
+      }
     }
   }
 }
@@ -702,6 +884,15 @@ watch(
       border-radius: 5px;
     }
   }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 .demo-tabs > .el-tabs__content {
   padding: 32px;

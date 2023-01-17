@@ -62,3 +62,27 @@ export const delGoodsByIds = (ids: number[]) => {
     },
   })
 }
+
+export const putOnOrDownGoods = (ids: number[], status: number) => {
+  return axRequest.post({
+    url: 'admin/goods/changestatus',
+    data: {
+      ids,
+      status,
+    },
+  })
+}
+
+export const checkGood = (id: number, ischeck: number) => {
+  return axRequest.post({
+    url: `admin/goods/${id}/check`,
+    data: { ischeck },
+  })
+}
+
+export const setGoodsBanners = (id: number, banners: string[]) => {
+  return axRequest.post({
+    url: `admin/goods/banners/${id}`,
+    data: { banners },
+  })
+}

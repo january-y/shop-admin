@@ -67,7 +67,7 @@ const props = withDefaults(
     padding: 0 !important;
   }
   .header {
-    padding-left: 20px;
+    padding: 0px 20px;
     height: 60px;
     border-bottom: 1px solid #eeeeee;
   }

@@ -3,18 +3,25 @@
     <div class="contain">
       <layoutContain asideWidth="250px" maintogglePage="80px" assidetogglePage="80px">
         <template #header>
-          <div class="header sc fontw">图片选择</div>
+          <div class="header-contain dfb">
+            <div class="header sc fontw">图片选择</div>
+            <div class="close cp" @click="handleExit">×</div>
+          </div>
         </template>
         <template #asside>
           <div class="asside">
             <template v-for="(item, index) in moreStore.imgInfos?.list" :key="item.id">
-              <div class="item dfb hover-bg">
+              <div
+                class="item dfb hover-bg"
+                @click.stop="handleAssideItemClick(item, index)"
+                :class="{ active: currentInfos.currentAssideIndex == index }"
+              >
                 <div class="title dfs oc">{{ item.name }}</div>
                 <div class="handle dfa fontc">
                   <el-icon>
-                    <Edit class="cp" />
+                    <Edit class="cp" @click.stop="" />
                   </el-icon>
-                  <el-icon><CloseBold class="cp" /></el-icon>
+                  <el-icon><CloseBold class="cp" @click.stop="" /></el-icon>
                 </div>
               </div>
             </template>
@@ -34,7 +41,7 @@
           <div class="main">
             <template v-for="(item, index) in moreStore.nowCategoryImgs?.list" :key="item.id">
               <div class="item">
-                <div class="content">
+                <div class="content boxs cp">
                   <div class="top">
                     <img :src="item.url" alt="" />
                     <div class="dfc">{{ item.name }}</div>
@@ -63,7 +70,7 @@
         <template #main-footer>
           <div class="contain-footer dfe pdr-20 pdb-20">
             <el-button @click="handleExit">取消</el-button>
-            <el-button type="primary">确定</el-button>
+            <el-button type="primary" @click="handleConfirmImg">确定</el-button>
           </div>
         </template>
       </layoutContain>
@@ -74,12 +81,16 @@
 <script setup lang="ts">
 import useMoreStore from '@/stores/more'
 import { useMessage } from '@/utils/useMessage'
+import { editImgName } from '@/services/modules/more'
 import { ref, reactive, defineAsyncComponent, watch } from 'vue'
 const layoutContain = defineAsyncComponent(() => import('@/components/layout-contain.vue'))
 
+const props = defineProps<{
+  imgCount: number
+}>()
+const emit = defineEmits(['confirm-select'])
 const moreStore = useMoreStore()
 moreStore.getImgListAction()
-
 // ref
 
 // variable
@@ -87,11 +98,13 @@ interface ICurrentInfos {
   currentItem: any
   checkImgArr: any
   currentMainPage: number
+  currentAssideIndex: number
 }
 const currentInfos = reactive<ICurrentInfos>({
   currentItem: '',
   checkImgArr: [],
   currentMainPage: 1,
+  currentAssideIndex: 0,
 })
 let isShow = ref<boolean>(false)
 // hooks
@@ -101,8 +114,8 @@ const handlePageChange = (page: number) => {
 const handleInputChange = (e: any, item: any) => {
   if (e.target.checked) {
     currentInfos.checkImgArr.push(item)
-    if (currentInfos.checkImgArr.length > 1) {
-      useMessage('warning', '最多选择一张图片')
+    if (currentInfos.checkImgArr.length > props.imgCount) {
+      useMessage('warning', `最多选择${props.imgCount}张图片`)
     }
   } else {
     currentInfos.checkImgArr.forEach((item2: any, index: number) => {
@@ -111,7 +124,6 @@ const handleInputChange = (e: any, item: any) => {
       }
     })
   }
-  console.log(currentInfos.checkImgArr)
 }
 const handleMainPageChange = (page: number) => {
   moreStore.getNowCategoryImgsAction(moreStore.firstCateId!, page, 10)
@@ -121,9 +133,21 @@ const open = () => {
 }
 const close = () => {
   isShow.value = false
+  currentInfos.checkImgArr = []
 }
 const handleExit = () => {
   isShow.value = false
+  currentInfos.checkImgArr = []
+}
+const handleConfirmImg = () => {
+  emit('confirm-select', currentInfos.checkImgArr)
+  isShow.value = false
+  currentInfos.checkImgArr = []
+}
+const handleAssideItemClick = (item: any, index: number) => {
+  currentInfos.currentItem = item
+  currentInfos.currentAssideIndex = index
+  moreStore.getNowCategoryImgsAction(item.id, 1, 10)
 }
 
 //
@@ -134,7 +158,7 @@ defineExpose({ open, close })
 .select-imgs {
   justify-content: flex-start;
   position: fixed;
-  z-index: 9;
+  z-index: 9999;
   left: 0;
   right: 0;
   top: 0;
@@ -143,8 +167,15 @@ defineExpose({ open, close })
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
   .contain {
-    .header {
-      font-size: 20px;
+    .header-contain {
+      width: 100%;
+      .header {
+        font-size: 20px;
+      }
+      .close {
+        font-size: 45px;
+        color: rgb(177, 177, 177);
+      }
     }
     .asside {
       .item {
@@ -156,6 +187,9 @@ defineExpose({ open, close })
         .handle {
           width: 100px;
         }
+      }
+      .active {
+        background-color: #f5f7fa;
       }
     }
     .main {
