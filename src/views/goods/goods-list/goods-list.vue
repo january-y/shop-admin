@@ -133,6 +133,43 @@
         </div>
       </template>
     </drawer-wrapper>
+    <!-- goods-detail-drawer -->
+    <drawerWrapper
+      @drawer-close="handleDetailDrawerClose"
+      @confirm="handleDetailDrawerConfirm"
+      ref="detailRef"
+      title="详情"
+      size="60%"
+    >
+      <template #default>
+        <span></span>
+      </template>
+      <template #main>
+        <div class="detail-drawer mgt-20">
+          <wang-editor @change="handleDetailInput" ref="wangEditorRef" />
+        </div>
+      </template>
+    </drawerWrapper>
+    <!-- goodsSku-drawer -->
+    <drawer-wrapper
+      @confirm="handleSkuConfirm"
+      @drawer-open="handleSkuDrawerOpen"
+      @drawer-close="handleSkuDrawerClose"
+      ref="skuDrawerRef"
+      title="商品规格"
+    >
+      <template #default>
+        <span></span>
+      </template>
+      <template #main>
+        <div class="sku-main mgt-20">
+          <goods-sku-form
+            @change="handleSkuFormChange"
+            :skuFromProps="skuFromProps"
+          ></goods-sku-form>
+        </div>
+      </template>
+    </drawer-wrapper>
     <!-- banners图片选择组件 -->
     <transition name="fade">
       <select-imgs
@@ -210,11 +247,37 @@
             <el-button type="primary" size="small" @click="handleNewClick">新增</el-button>
             <el-popconfirm title="是否要删除？" @confirm="handleDelGoods">
               <template #reference>
-                <el-button type="danger" size="small">批量删除</el-button>
+                <el-button type="danger" size="small" v-show="currentInfo.tab != 'delete'"
+                  >批量删除</el-button
+                >
               </template>
             </el-popconfirm>
-            <el-button size="small" @click="handlePutOnGoods">上架</el-button>
-            <el-button size="small" @click="handlePutDownGoods">下架</el-button>
+            <el-popconfirm title="是否要删除？" @confirm="handleDelGoodsForever">
+              <template #reference>
+                <el-button type="danger" size="small" v-show="currentInfo.tab == 'delete'"
+                  >彻底删除</el-button
+                >
+              </template>
+            </el-popconfirm>
+            <el-popconfirm title="是否要恢复？" @confirm="handleRecoverGoods">
+              <template #reference>
+                <el-button type="warning" size="small" v-show="currentInfo.tab == 'delete'"
+                  >恢复商品</el-button
+                >
+              </template>
+            </el-popconfirm>
+            <el-button
+              size="small"
+              @click="handlePutOnGoods"
+              v-show="currentInfo.tab == 'all' || currentInfo.tab == 'off'"
+              >上架</el-button
+            >
+            <el-button
+              size="small"
+              @click="handlePutDownGoods"
+              v-show="currentInfo.tab == 'all' || currentInfo.tab == 'saling'"
+              >下架</el-button
+            >
           </div>
           <div class="right">
             <el-icon class="cp"><Refresh @click="getData" /></el-icon>
@@ -244,7 +307,12 @@
             </template>
           </el-table-column>
           <el-table-column property="sale_count" label="实际销量" width="100" align="center" />
-          <el-table-column label="商品状态" width="100" align="center">
+          <el-table-column
+            label="商品状态"
+            width="100"
+            align="center"
+            v-if="currentInfo.tab != 'delete'"
+          >
             <template #default="scope">
               <div class="dfc">
                 <div class="status-up" v-if="scope.row.status == 1">上架</div>
@@ -265,21 +333,30 @@
           <el-table-column property="stock" label="总库存" width="80" align="center" />
           <el-table-column label="操作" align="right">
             <template #default="scope">
-              <div class="dfe">
-                <span class="mgr-20 small fontc underline cp" @click="handleEdit(scope.row)"
-                  >修改</span
-                >
-                <span class="mgr-20 small fontc underline cp">商品规格</span>
-                <span class="mgr-20 small fontc underline cp" @click="handleSetBanners(scope.row)"
-                  >设置轮播图</span
-                >
-                <span class="mgr-20 small fontc underline cp">商品详情</span>
-                <el-popconfirm title="是否要删除?" @confirm="handleDelGood(scope.row.id)">
-                  <template #reference>
-                    <span class="small fontc underline cp">删除</span>
-                  </template>
-                </el-popconfirm>
+              <div v-if="currentInfo.tab != 'delete'">
+                <div class="dfe">
+                  <span class="mgr-20 small fontc underline cp" @click="handleEdit(scope.row)"
+                    >修改</span
+                  >
+                  <span
+                    class="mgr-20 small fontc underline cp"
+                    @click="handleGoodsSkuClick(scope.row)"
+                    >商品规格</span
+                  >
+                  <span class="mgr-20 small fontc underline cp" @click="handleSetBanners(scope.row)"
+                    >设置轮播图</span
+                  >
+                  <span class="mgr-20 small fontc underline cp" @click="handleGoodsDetailClick"
+                    >商品详情</span
+                  >
+                  <el-popconfirm title="是否要删除?" @confirm="handleDelGood(scope.row.id)">
+                    <template #reference>
+                      <span class="small fontc underline cp">删除</span>
+                    </template>
+                  </el-popconfirm>
+                </div>
               </div>
+              <div v-else>暂无操作</div>
             </template>
           </el-table-column>
         </el-table>
@@ -309,11 +386,16 @@ import {
   putOnOrDownGoods,
   checkGood,
   setGoodsBanners,
+  updateGoodsSku,
+  delGoodsByIdsForever,
+  recoverGoods,
 } from '@/services/modules/goods'
 import { useMessage } from '@/utils/useMessage'
 const selectImgs = defineAsyncComponent(() => import('@/components/select-imgs.vue'))
 const drawerWrapper = defineAsyncComponent(() => import('@/components/drawer-wrapper.vue'))
 const layoutContain = defineAsyncComponent(() => import('@/components/layout-contain.vue'))
+const wangEditor = defineAsyncComponent(() => import('@/components/wangEditor.vue'))
+const goodsSkuForm = defineAsyncComponent(() => import('./c-cpns/goods-sku-from.vue'))
 
 const goodsStore = useGoodsStore()
 goodsStore.getGoodInfosAction(1, {
@@ -328,6 +410,9 @@ const tableRef = ref<any>()
 const selectImgsRef = ref<InstanceType<typeof selectImgs>>()
 const bannersDrawerRef = ref<InstanceType<typeof drawerWrapper>>()
 const selectBannersRef = ref<InstanceType<typeof selectImgs>>()
+const detailRef = ref<InstanceType<typeof drawerWrapper>>()
+const wangEditorRef = ref<InstanceType<typeof wangEditor>>()
+const skuDrawerRef = ref<InstanceType<typeof drawerWrapper>>()
 // variable
 interface ICurrentInfo {
   tab: string
@@ -339,6 +424,7 @@ interface ICurrentInfo {
   item: any
   bannerDrawerTitle: string
   checkedBanners: any
+  goodsSkuFormSingle: any
 }
 interface IDrawerAddEditForm {
   title: string
@@ -363,7 +449,9 @@ const currentInfo = reactive<ICurrentInfo>({
   item: '',
   bannerDrawerTitle: '设置轮播图',
   checkedBanners: [],
+  goodsSkuFormSingle: {},
 })
+let skuFromProps = ref<any>()
 const drawerAddEditForm = reactive<IDrawerAddEditForm>({
   title: '',
   category_id: 5,
@@ -460,6 +548,7 @@ function resetForm() {
 }
 const handleTabChange = (tabName: string) => {
   // 发送相关网络请求
+  goodsStore.getGoodInfosAction(1, { tab: tabName })
   console.log(tabName)
 }
 const handleSearchGood = () => {
@@ -571,15 +660,37 @@ const handleDelGoods = () => {
   delGoodsByIds(ids)
     .then((res: any) => {
       useMessage('success', '删除成功')
-      getData()
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
     })
     .catch(() => useMessage('error', '删除失败'))
+}
+const handleDelGoodsForever = () => {
+  const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
+  delGoodsByIdsForever(ids)
+    .then((res: any) => {
+      useMessage('success', '彻底删除成功')
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
+    })
+    .catch(() => useMessage('error', '删除失败'))
+}
+const handleRecoverGoods = () => {
+  const ids = tableRef.value.getSelectionRows().map((item: any) => item.id)
+  recoverGoods(ids)
+    .then((res: any) => {
+      useMessage('success', '恢复成功')
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
+    })
+    .catch(() => useMessage('error', '恢复失败'))
 }
 const handleDelGood = (id: number) => {
   delGoodsByIds([id])
     .then((res: any) => {
       useMessage('success', '删除成功')
-      getData()
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
     })
     .catch(() => useMessage('error', '删除失败'))
 }
@@ -591,7 +702,8 @@ const handlePutOnGoods = () => {
   putOnOrDownGoods(ids, 1)
     .then((res: any) => {
       useMessage('success', '上架成功')
-      getData()
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
     })
     .catch(() => useMessage('error', '上架失败'))
 }
@@ -600,7 +712,8 @@ const handlePutDownGoods = () => {
   putOnOrDownGoods(ids, 0)
     .then((res: any) => {
       useMessage('success', '下架成功')
-      getData()
+      goodsStore.getGoodInfosAction(1, { tab: currentInfo.tab })
+      // getData()
     })
     .catch(() => useMessage('error', '下架失败'))
 }
@@ -653,6 +766,48 @@ const handleSelectBannersConfirm = (e: any) => {
 const handleDelBanner = (id: number) => {
   const res = currentInfo.checkedBanners.findIndex((item: any) => item.id == id)
   if (res !== -1) currentInfo.checkedBanners.splice(res, 1)
+}
+const handleDetailDrawerClose = () => {
+  wangEditorRef.value?.resetEditor()
+  console.log('handleDetailDrawerClose')
+}
+const handleDetailDrawerConfirm = () => {
+  console.log('handleDetailDrawerConfirm')
+}
+const handleGoodsDetailClick = () => {
+  detailRef.value?.open()
+}
+const handleDetailInput = (e: any) => {
+  console.log(e)
+}
+const handleGoodsSkuClick = (item: any) => {
+  currentInfo.item = item
+  skuDrawerRef.value?.open()
+}
+const handleSkuDrawerClose = () => {
+  console.log('handleSkuDrawerClose')
+}
+const handleSkuDrawerOpen = () => {
+  skuFromProps.value = { sku_type: currentInfo.item.sku_type, ...currentInfo.item.sku_value }
+}
+const handleSkuConfirm = () => {
+  let objForm: any = {}
+  for (let i in currentInfo.goodsSkuFormSingle) {
+    if (i != 'sku_type') {
+      objForm[i] = currentInfo.goodsSkuFormSingle[i]
+    }
+  }
+  if (currentInfo.goodsSkuFormSingle['sku_type'] == 0) {
+    updateGoodsSku(currentInfo.item.id, currentInfo.goodsSkuFormSingle['sku_type'], objForm).then(
+      (res: any) => {
+        console.log(res)
+      },
+    )
+  }
+}
+// mitt函数
+const handleSkuFormChange = (e: any) => {
+  currentInfo.goodsSkuFormSingle = e
 }
 
 //
@@ -747,6 +902,9 @@ watch(
       }
     }
   }
+}
+.sku-main {
+  margin-left: -50px;
 }
 .select-img {
   display: none;

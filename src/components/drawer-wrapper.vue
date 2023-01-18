@@ -38,7 +38,7 @@ const props = withDefaults(
     size: '45%',
   },
 )
-const emit = defineEmits(['confirm', 'drawer-close'])
+const emit = defineEmits(['confirm', 'drawer-close', 'drawer-open'])
 const instance = getCurrentInstance()
 let isShow = ref(false)
 const confirmLoading = ref<boolean>(false)
@@ -70,6 +70,12 @@ watch(
   () => isShow.value,
   () => {
     if (!isShow.value) emit('drawer-close')
+  },
+)
+watch(
+  () => isShow.value,
+  () => {
+    if (isShow.value) emit('drawer-open')
   },
 )
 

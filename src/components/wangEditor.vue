@@ -1,5 +1,5 @@
 <template>
-  <div class="category-list">
+  <div class="wang-editor">
     <div style="border: 1px solid #ccc">
       <Toolbar
         style="border-bottom: 1px solid #ccc"
@@ -110,7 +110,10 @@ onBeforeUnmount(() => {
 
 const handleCreated = (editor: any) => {
   editorRef.value = editor // 记录 editor 实例，重要！ // 查看所有工具栏key，先查看可以根据实际情况进项增删
-  console.log(editor.getAllMenuKeys())
+  // console.log(editor.getAllMenuKeys())
+}
+const resetEditor = () => {
+  valueHtml.value = ''
 }
 
 //
@@ -120,9 +123,11 @@ watch(
     emit('change', valueHtml.value)
   },
 )
+
+defineExpose({ resetEditor })
 </script>
 
 <style lang="less" scoped>
-.category-list {
+.wang-editor {
 }
 </style>

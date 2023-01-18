@@ -67,6 +67,7 @@ declare module '@vue/runtime-core' {
     Test: typeof import('./src/components/test.vue')['default']
     Tooltip: typeof import('./src/components/tooltip.vue')['default']
     UserList: typeof import('./src/components/user-list.vue')['default']
+    WangEditor: typeof import('./src/components/wangEditor.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

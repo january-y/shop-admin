@@ -63,12 +63,28 @@ export const delGoodsByIds = (ids: number[]) => {
   })
 }
 
+export const delGoodsByIdsForever = (ids: number[]) => {
+  return axRequest.post({
+    url: 'admin/goods/destroy',
+    data: { ids },
+  })
+}
+
 export const putOnOrDownGoods = (ids: number[], status: number) => {
   return axRequest.post({
     url: 'admin/goods/changestatus',
     data: {
       ids,
       status,
+    },
+  })
+}
+
+export const recoverGoods = (ids: number[]) => {
+  return axRequest.post({
+    url: 'admin/goods/restore',
+    data: {
+      ids,
     },
   })
 }
@@ -84,5 +100,29 @@ export const setGoodsBanners = (id: number, banners: string[]) => {
   return axRequest.post({
     url: `admin/goods/banners/${id}`,
     data: { banners },
+  })
+}
+
+interface ISkuValue {
+  sku_type: number
+  oprice: number
+  pprice: number
+  cprice: number
+  weight: number
+  volume: number
+}
+export const updateGoodsSku = (
+  id: number,
+  sku_type: number,
+  sku_value?: ISkuValue,
+  goodsSkus?: any,
+) => {
+  return axRequest.post({
+    url: 'admin/goods/updateskus/' + id,
+    data: {
+      sku_type,
+      sku_value,
+      goodsSkus,
+    },
   })
 }
